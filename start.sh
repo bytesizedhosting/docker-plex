@@ -8,6 +8,7 @@ fi
 RUN_AS_ROOT=${RUN_AS_ROOT:-true}
 CHANGE_DIR_RIGHTS=${CHANGE_DIR_RIGHTS:-false}
 CHANGE_CONFIG_DIR_OWNERSHIP=${CHANGE_CONFIG_DIR_OWNERSHIP:-true}
+
 PUID=${PUID:-1001}
 PGID=${PGID:-1000}
 
@@ -24,9 +25,14 @@ if [ "$(id -u)" -eq 0 -a "$(id -g)" -eq 0 ]; then
     GROUP=$(getent group "$TARGET_GID" | cut -d: -f1)
   fi
 
-  if [ ! "$(id -u plex)" -eq "$PUID" ];
-    echo "Setting UID to '$PUID'"
-  then usermod -o -u "$PUID" plex
+  if [ ! "$(id -g $GROUP)" -eq "$PGID" ]; then
+    groupmod -o -g "$PGID" $GROUP
+  else
+    echo "GID already set correctly"
+  fi
+
+  if [ ! "$(id -u plex)" -eq "$PUID" ]; then
+    usermod -o -u "$PUID" plex
   else
     echo "UID already set correctly"
   fi
@@ -35,10 +41,6 @@ if [ "$(id -u)" -eq 0 -a "$(id -g)" -eq 0 ]; then
 
   if [[ -n "${SKIP_CHOWN_CONFIG}" ]]; then
     CHANGE_CONFIG_DIR_OWNERSHIP=false
-  fi
-
-  if [ "${CHANGE_CONFIG_DIR_OWNERSHIP,,}" = "true" ]; then
-    find /config ! -user plex -print0 | xargs -0 -I{} chown -R plex: {}
   fi
 
   # Will change all files in directory to be readable by group
@@ -117,6 +119,11 @@ PLEX_ALLOWED_NETWORKS=${PLEX_ALLOWED_NETWORKS:-$(ip route | grep '/' | awk '{pri
 
 # Remove previous pid if it exists
 rm -f "${PLEX_PID}"
+
+if [ "${CHANGE_CONFIG_DIR_OWNERSHIP,,}" = "true" ]; then
+  find /config ! -user plex -print0 | xargs -0 -I{} chown -R plex: {}
+fi
+
 
 # Current defaults to run as root while testing.
 if [ "${RUN_AS_ROOT,,}" = "true" ]; then
