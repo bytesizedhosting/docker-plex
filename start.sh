@@ -13,20 +13,10 @@ PUID=${PUID:-1001}
 PGID=${PGID:-1000}
 
 if [ "$(id -u)" -eq 0 -a "$(id -g)" -eq 0 ]; then
-  GROUP=plextmp
   TARGET_GID=$PGID
-  EXISTS=$(getent group "${TARGET_GID}" | wc -l)
 
-  # Create new group using target GID and add plex user
-  if [ "$EXISTS" = "0" ]; then
-    groupadd --gid "${TARGET_GID}" "${GROUP}"
-  else
-    # GID exists, find group name and add
-    GROUP=$(getent group "$TARGET_GID" | cut -d: -f1)
-  fi
-
-  if [ ! "$(id -g $GROUP)" -eq "$PGID" ]; then
-    groupmod -o -g "$PGID" $GROUP
+  if [ ! "$(id -g plex)" -eq "$PGID" ]; then
+    groupmod -o -g "$PGID" plex
   else
     echo "GID already set correctly"
   fi
@@ -36,8 +26,6 @@ if [ "$(id -u)" -eq 0 -a "$(id -g)" -eq 0 ]; then
   else
     echo "UID already set correctly"
   fi
-
-  usermod -a -G "${GROUP}" plex
 
   if [[ -n "${SKIP_CHOWN_CONFIG}" ]]; then
     CHANGE_CONFIG_DIR_OWNERSHIP=false
@@ -64,6 +52,7 @@ getPreference(){
 setPreference(){
   local preference_key="$1"
   local preference_val="$2"
+  echo "Setting Preference $1 to $2"
   if [ -z "$(getPreference "$preference_key")" ]; then
     xmlstarlet ed --inplace --insert "Preferences" --type attr -n "$preference_key" -v "$preference_val" "${PLEX_PREFERENCES}"
   else
