@@ -30,7 +30,7 @@ RUN echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/02apt-speedup &&\
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /tmp/*
 
-VOLUME ["/config","/data"]
+VOLUME ["/config","/data", "/media"]
 
 ENV RUN_AS_ROOT="true" \
     CHANGE_DIR_RIGHTS="false" \
