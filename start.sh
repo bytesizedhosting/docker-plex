@@ -112,13 +112,16 @@ if [ "${CHANGE_CONFIG_DIR_OWNERSHIP,,}" = "true" ]; then
   find /config ! -user plex -print0 | xargs -0 -I{} chown -R plex: {}
 fi
 
+echo "Start up almost complete, chowning folders"
 chown plex /config
 chown plex /data
 chown plex /media
 
 # Current defaults to run as root while testing.
 if [ "${RUN_AS_ROOT,,}" = "true" ]; then
+  echo "Starting as root"
   /usr/sbin/start_pms
 else
+  echo "Starting as user"
   sudo -u plex -E sh -c "/usr/sbin/start_pms"
 fi
