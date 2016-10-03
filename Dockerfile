@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND="noninteractive" \
 ENV PLEX_PPA_DIST="wheezy" \
     PLEX_PASS_PPA="plexpass"
 
-ARG PLEX_VERSION='plexpass'
+ARG PLEX_VERSION='wheezy'
 
 RUN echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/02apt-speedup &&\
     echo "Acquire::http {No-Cache=True;};" > /etc/apt/apt.conf.d/no-cache && \
