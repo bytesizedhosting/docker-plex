@@ -113,9 +113,9 @@ if [ "${CHANGE_CONFIG_DIR_OWNERSHIP,,}" = "true" ]; then
 fi
 
 echo "Start up almost complete, chowning folders"
-chown plex /config
-chown plex /data
-chown plex /media
+chown plex:plex /config
+chown plex:plex /data
+chown plex:plex /media
 
 # Current defaults to run as root while testing.
 if [ "${RUN_AS_ROOT,,}" = "true" ]; then
