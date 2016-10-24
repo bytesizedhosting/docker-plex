@@ -15,12 +15,14 @@ if [ "$(id -u)" -eq 0 -a "$(id -g)" -eq 0 ]; then
   TARGET_GID=$PGID
 
   if [ ! "$(id -g plex)" -eq "$PGID" ]; then
+    echo "Modifying group to $GPID"
     groupmod -o -g "$PGID" plex
   else
     echo "GID already set correctly"
   fi
 
   if [ ! "$(id -u plex)" -eq "$PUID" ]; then
+    echo "Modifying user to $PUID"
     usermod -o -u "$PUID" plex
   else
     echo "UID already set correctly"
